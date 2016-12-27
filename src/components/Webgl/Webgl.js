@@ -1,8 +1,8 @@
 import projects from 'config/projects';
 import States from 'core/States';
 import raf from 'raf';
-
 import CSS3DRenderer from 'helpers/CSS3DRenderer';
+import Background from './Meshes/Background/Background';
 
 import './webgl.styl';
 
@@ -29,6 +29,9 @@ export default Vue.extend({
   },
 
   mounted() {
+
+    this.webglRenderer.domElement.style.position = 'absolute';
+    this.$refs.container.appendChild(this.webglRenderer.domElement);
     this.$refs.container.appendChild(this.cssRenderer.domElement);
   },
 
@@ -36,19 +39,30 @@ export default Vue.extend({
 
     setup() {
 
-      this.createWebGL(window.innerWidth, window.innerHeight);
+      this.createRenderers(window.innerWidth, window.innerHeight);
+      this.createWebgl();
     },
 
-    createWebGL(width, height) {
+    createRenderers(width, height) {
 
       this.scene = new THREE.Scene();
 
       this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       this.camera.position.z = 1;
 
+      this.webglRenderer = new THREE.WebGLRenderer();
+      this.webglRenderer.setSize(width, height);
+      this.webglRenderer.setClearColor(0x000000);
+
       this.cssRenderer = new THREE.CSS3DRenderer();
       this.cssRenderer.setSize(width, height);
-      this.cssRenderer.setClearColor(0x000000);
+    },
+
+    createWebgl() {
+
+      this.background = new Background();
+      this.background.position.setZ(-30);
+      this.scene.add(this.background);
     },
 
     createCSSObjects() {
@@ -89,7 +103,7 @@ export default Vue.extend({
         const object = new THREE.CSS3DObject( container );
         const x = ( ( window.innerWidth / projectList.length ) * i ) - ( window.innerWidth * 0.5 );
         object.position.x = x;
-        object.position.y = ( Math.random() * 50 ) - 25;
+        object.position.y = ( Math.random() * 100 ) - 50;
         object.position.z = -2000;
 
         this.scene.add(object);
@@ -106,12 +120,15 @@ export default Vue.extend({
 
       this.createCSSObjects();
       this.render();
+      this.animate();
     },
 
     /* Update */
 
     animate() {
-      // raf(animate);
+      raf(this.animate);
+
+      this.webglRenderer.render(this.scene, this.camera);
     },
 
     render() {

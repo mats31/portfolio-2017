@@ -50,9 +50,8 @@ const Config = {
         loader: 'style-loader!css-loader!stylus-loader',
       },
       {
-        test: /\.(glsl|frag|vert)$/,
-        loader: 'raw-loader!glslify-loader',
-        exclude: /node_modules/,
+        test: /\.(glsl|vs|fs)$/,
+        loader: 'shader',
       },
       {
         test: /animation.gsap\.js$/,
@@ -60,6 +59,9 @@ const Config = {
       },
     ],
   },
+  // glsl: {
+  //   chunkPath: path(__dirname, '/glsl/chunks'),
+  // },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
