@@ -63,6 +63,9 @@ export default Vue.extend({
       this.background = new Background();
       this.background.position.setZ(-30);
       this.scene.add(this.background);
+
+      this.camera.fov = 2 * Math.atan( ( 200 / this.camera.aspect ) / ( 2 * 31 ) ) * ( 180 / Math.PI );
+      this.camera.updateProjectionMatrix();
     },
 
     createCSSObjects() {
