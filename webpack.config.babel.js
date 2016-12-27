@@ -67,6 +67,7 @@ const Config = {
       template: 'src/template/index.tpl.html',
     }),
     new webpack.ProvidePlugin({
+      THREE: 'three',
       Vue: 'vue/dist/vue',
     }),
     new CopyWebpackPlugin([

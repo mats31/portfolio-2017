@@ -33,6 +33,7 @@
     "min-signal": "0.0.6",
     "mobile-detect": "*",
     "raf": "^3.3.0",
+    "three": "^0.83.0",
     "vue": "^2.1.7",
     "vue-router": "^2.1.1"
   },

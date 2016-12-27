@@ -1,4 +1,5 @@
-import TitleComponent from '../../components/Title/Title';
+import TitleComponent from 'components/Title/Title';
+import WebglComponent from 'components/Webgl/Webgl';
 
 import './home.styl';
 
@@ -23,5 +24,6 @@ export default Vue.extend({
 
   components: {
     'title-component': TitleComponent,
+    'webgl-component': WebglComponent,
   },
 });
