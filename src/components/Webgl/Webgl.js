@@ -47,8 +47,11 @@ export default Vue.extend({
 
       this.scene = new THREE.Scene();
 
-      this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
-      this.camera.position.z = 1;
+      this.webglCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
+      this.webglCamera.position.z = 1;
+
+      this.cssCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
+      this.cssCamera.position.z = 1;
 
       this.webglRenderer = new THREE.WebGLRenderer();
       this.webglRenderer.setSize(width, height);
@@ -64,8 +67,8 @@ export default Vue.extend({
       this.background.position.setZ(-30);
       this.scene.add(this.background);
 
-      this.camera.fov = 2 * Math.atan( ( 200 / this.camera.aspect ) / ( 2 * 31 ) ) * ( 180 / Math.PI );
-      this.camera.updateProjectionMatrix();
+      this.webglCamera.fov = 2 * Math.atan( ( 200 / this.webglCamera.aspect ) / ( 2 * 31 ) ) * ( 180 / Math.PI );
+      this.webglCamera.updateProjectionMatrix();
     },
 
     createCSSObjects() {
@@ -121,6 +124,8 @@ export default Vue.extend({
 
     onAssetsLoaded() {
 
+      console.log(this);
+
       this.createCSSObjects();
       this.render();
       this.animate();
@@ -131,11 +136,11 @@ export default Vue.extend({
     animate() {
       raf(this.animate);
 
-      this.webglRenderer.render(this.scene, this.camera);
+      this.webglRenderer.render(this.scene, this.webglCamera);
     },
 
     render() {
-      this.cssRenderer.render( this.scene, this.camera);
+      this.cssRenderer.render(this.scene, this.cssCamera);
     },
   },
 

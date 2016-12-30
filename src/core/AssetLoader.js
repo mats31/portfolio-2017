@@ -1,6 +1,6 @@
 import States from 'core/States';
 import resources from 'config/resources';
-// import { TextureLoader } from 'three';
+import { TextureLoader } from 'three';
 
 class AssetLoader {
 

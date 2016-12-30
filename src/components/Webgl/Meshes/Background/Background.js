@@ -1,7 +1,6 @@
 import vertexShader from './shaders/background.vs';
-// const vertexShader = require('./shaders/background.vs');
-// const fragmentShader = require('./shaders/background.fs');
 import fragmentShader from './shaders/background.fs';
+import States from 'core/States';
 
 class Background extends THREE.Object3D {
 
@@ -17,15 +16,31 @@ class Background extends THREE.Object3D {
       uniforms: {
         time: { value: 0.0 },
         color: { value: new THREE.Color(0xffffff) },
+        map: { type: 't', value: new THREE.Texture() },
       },
-      wireframe: true,
+      wireframe: false,
       side: THREE.DoubleSide,
     });
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.add(this.mesh);
 
+    Signals.onAssetsLoaded.add(this.onAssetsLoaded.bind(this));
+
     // this.addGUI()
+  }
+
+  onAssetsLoaded() {
+
+    const texture = States.resources.getTexture('intro-background').media;
+    texture.needsUpdate = true;
+    texture.minFilter = THREE.LinearFilter;
+
+    this.material.uniforms.map.value = texture;
+  }
+
+  update(time) {
+    this.material.uniforms.time.value = time * 0.3;
   }
 
   // addGUI() {
@@ -41,10 +56,6 @@ class Background extends THREE.Object3D {
   //   scaleFolder.add(this.scale, 'y', { label: 'scale y', min: 0, max: 10, step: 0.1 })
   //   scaleFolder.add(this.scale, 'z', { label: 'scale z', min: 0, max: 10, step: 0.1 })
   // }
-
-  update(time) {
-    this.material.uniforms.time.value = time * 0.3;
-  }
 }
 
 export default Background;
