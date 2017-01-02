@@ -83,8 +83,6 @@ export default Vue.extend({
 
       this.cssRenderer = new THREE.CSS3DRenderer();
       this.cssRenderer.setSize(width, height);
-
-      console.log(THREE);
     },
 
     createWebgl() {
