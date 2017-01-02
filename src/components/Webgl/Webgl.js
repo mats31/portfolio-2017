@@ -77,7 +77,9 @@ export default Vue.extend({
       this.cssCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       this.cssCamera.position.z = 1;
 
-      this.webglRenderer = new THREE.WebGLRenderer();
+      this.webglRenderer = new THREE.WebGLRenderer({
+        antialias: true,
+      });
       this.webglRenderer.setSize(width, height);
       this.webglRenderer.setClearColor(0xffffff);
 
