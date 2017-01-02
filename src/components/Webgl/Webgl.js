@@ -77,14 +77,14 @@ export default Vue.extend({
       this.cssCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       this.cssCamera.position.z = 1;
 
-      this.webglRenderer = new THREE.WebGLRenderer({
-        antialias: true,
-      });
+      this.webglRenderer = new THREE.WebGLRenderer();
       this.webglRenderer.setSize(width, height);
       this.webglRenderer.setClearColor(0xffffff);
 
       this.cssRenderer = new THREE.CSS3DRenderer();
       this.cssRenderer.setSize(width, height);
+
+      console.log(THREE);
     },
 
     createWebgl() {
@@ -133,7 +133,6 @@ export default Vue.extend({
       for (let i = 0; i < projectList.length; i += 1) {
 
         const id = `${projectList[i].id}-preview`;
-        console.log(id);
         const img = States.resources.getImage(id).media;
         const texture = new THREE.TextureLoader().load( img.src );
         texture.minFilter = THREE.LinearFilter;
