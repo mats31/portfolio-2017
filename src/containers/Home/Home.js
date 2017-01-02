@@ -1,4 +1,4 @@
-import TitleComponent from 'components/Title/Title';
+import ProjectListComponent from 'components/ProjectList/ProjectList';
 import WebglComponent from 'components/Webgl/Webgl';
 
 import './home.styl';
@@ -23,7 +23,7 @@ export default Vue.extend({
   },
 
   components: {
-    'title-component': TitleComponent,
+    'projectlist-component': ProjectListComponent,
     'webgl-component': WebglComponent,
   },
 });

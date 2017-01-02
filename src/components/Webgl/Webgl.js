@@ -1,8 +1,19 @@
 import projects from 'config/projects';
 import States from 'core/States';
 import raf from 'raf';
+
 import CSS3DRenderer from 'helpers/CSS3DRenderer';
+import CopyShader from 'helpers/CopyShader';
+import EffectComposer from 'helpers/EffectComposer';
+import ClearPass from 'helpers/ClearPass';
+import TexturePass from 'helpers/TexturePass';
+import { ClearMaskPass } from 'helpers/MaskPass';
+import ShaderPass from 'helpers/ShaderPass';
+
+import Clock from 'helpers/Clock';
+
 import Background from './Meshes/Background/Background';
+import ProjectObject from './Meshes/Project/Project';
 
 import './webgl.styl';
 
@@ -22,6 +33,8 @@ export default Vue.extend({
 
   created() {
 
+    // console.log(THREE);
+
     this.setup();
 
     // Signals.onAssetLoaded.add(this.onAssetLoaded);
@@ -39,13 +52,24 @@ export default Vue.extend({
 
     setup() {
 
+      this.composer = null;
+      this.projectObjects = [];
+
       this.createRenderers(window.innerWidth, window.innerHeight);
       this.createWebgl();
     },
 
     createRenderers(width, height) {
 
-      this.scene = new THREE.Scene();
+      this.scenes = [];
+
+      // this.scene = new THREE.Scene();
+
+      const projectList = projects.projectList;
+      for (let i = 0; i < projectList.length; i += 1) {
+        const scene = new THREE.Scene();
+        this.scenes.push(scene);
+      }
 
       this.webglCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       this.webglCamera.position.z = 1;
@@ -55,7 +79,7 @@ export default Vue.extend({
 
       this.webglRenderer = new THREE.WebGLRenderer();
       this.webglRenderer.setSize(width, height);
-      this.webglRenderer.setClearColor(0x000000);
+      this.webglRenderer.setClearColor(0xffffff);
 
       this.cssRenderer = new THREE.CSS3DRenderer();
       this.cssRenderer.setSize(width, height);
@@ -65,10 +89,61 @@ export default Vue.extend({
 
       this.background = new Background();
       this.background.position.setZ(-30);
-      this.scene.add(this.background);
+      // this.scene.add(this.background);
 
       this.webglCamera.fov = 2 * Math.atan( ( 200 / this.webglCamera.aspect ) / ( 2 * 31 ) ) * ( 180 / Math.PI );
       this.webglCamera.updateProjectionMatrix();
+    },
+
+    addProjects() {
+
+      const projectList = projects.projectList;
+      for (let i = 0; i < projectList.length; i += 1) {
+        const projectObject = new ProjectObject();
+        projectObject.position.x = -55 + ( 55 * i );
+        projectObject.position.z = -30;
+
+        this.projectObjects.push( projectObject );
+
+        this.scenes[i].add(projectObject);
+      }
+    },
+
+    createComposer() {
+
+      const clearPass = new THREE.ClearPass();
+      const clearMaskPass = new THREE.ClearMaskPass();
+
+      const outputPass = new THREE.ShaderPass( THREE.CopyShader );
+      outputPass.renderToScreen = true;
+
+      const parameters = {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        format: THREE.RGBFormat,
+        stencilBuffer: true,
+      };
+      const renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
+      this.composer = new THREE.EffectComposer( this.webglRenderer, renderTarget );
+      this.composer.addPass( clearPass );
+
+      const projectList = projects.projectList;
+      for (let i = 0; i < projectList.length; i += 1) {
+
+        const id = `${projectList[i].id}-preview`;
+        console.log(id);
+        const img = States.resources.getImage(id).media;
+        const texture = new THREE.TextureLoader().load( img.src );
+        texture.minFilter = THREE.LinearFilter;
+        const maskPass = new THREE.MaskPass( this.scenes[i], this.webglCamera );
+        const texturePass = new THREE.TexturePass( texture, 1, i );
+
+        this.composer.addPass( maskPass );
+        this.composer.addPass( texturePass );
+        this.composer.addPass( clearMaskPass );
+      }
+
+      this.composer.addPass( outputPass );
     },
 
     createCSSObjects() {
@@ -108,9 +183,11 @@ export default Vue.extend({
 
         const object = new THREE.CSS3DObject( container );
         const x = ( ( window.innerWidth / projectList.length ) * i ) - ( window.innerWidth * 0.5 );
+        const vFOV = this.cssCamera.fov * ( Math.PI / 180 );
+        const z = window.innerHeight / ( 2 * Math.tan( vFOV / 2 ) ) * -1;
         object.position.x = x;
-        object.position.y = ( Math.random() * 100 ) - 50;
-        object.position.z = -2000;
+        object.position.y = 0;
+        object.position.z = z;
 
         this.scene.add(object);
       }
@@ -124,10 +201,12 @@ export default Vue.extend({
 
     onAssetsLoaded() {
 
-      console.log(this);
+      this.clock = new Clock();
 
-      this.createCSSObjects();
-      this.render();
+      this.createComposer();
+      this.addProjects();
+      // this.createCSSObjects();
+      // this.render();
       this.animate();
     },
 
@@ -136,7 +215,14 @@ export default Vue.extend({
     animate() {
       raf(this.animate);
 
-      this.webglRenderer.render(this.scene, this.webglCamera);
+      for ( let i = 0; i < this.projectObjects.length; i += 1) {
+        this.projectObjects[i].update( this.clock.time );
+      }
+
+      // this.webglRenderer.render(this.scene, this.webglCamera);
+
+      this.webglRenderer.clear();
+      this.composer.render();
     },
 
     render() {

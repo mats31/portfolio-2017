@@ -1,0 +1,9 @@
+<div class="projectList" v-if="assetsLoaded">
+  <ul class="projectList__list">
+    <li class="projectList__item" v-for="project in projectList">
+      <h2>{{ project.title }}</h2>
+      <p>{{ project.subtitle }}</p>
+      <img v-bind:src="project.image.src" v-bind:alt="project.title"></img>
+    </li>
+  </ul>
+</div>
