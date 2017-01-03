@@ -9,7 +9,7 @@ class Project extends THREE.Object3D {
 
     this.nbGeometry = 10;
     this.geometries = [
-      new THREE.PlaneGeometry(8, 8, 1, 1),
+      // new THREE.PlaneGeometry(8, 8, 1, 1),
       new THREE.BoxGeometry(8, 8, 8, 1, 1, 1),
       new THREE.BoxGeometry(8, 8, 10, 1, 1, 1),
       new THREE.SphereGeometry(5, 10, 10),
@@ -44,6 +44,38 @@ class Project extends THREE.Object3D {
 
       this.meshes.push(mesh);
       this.add(mesh);
+    }
+  }
+
+  onZoomIn() {
+
+    for (let i = 0; i < this.meshes.length; i += 1) {
+      TweenLite.to(
+        this.meshes[i].scale,
+        0.5,
+        {
+          x: 2,
+          y: 2,
+          z: 2,
+          ease: 'Power2.easeOut',
+        },
+      );
+    }
+  }
+
+  onZoomOut() {
+
+    for (let i = 0; i < this.meshes.length; i += 1) {
+      TweenLite.to(
+        this.meshes[i].scale,
+        0.5,
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          ease: 'Power2.easeOut',
+        },
+      );
     }
   }
 

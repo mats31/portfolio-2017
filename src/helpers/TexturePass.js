@@ -33,9 +33,8 @@ THREE.TexturePass = function ( map, opacity, index ) {
 	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 	this.scene  = new THREE.Scene();
 
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.66, 0.66 ), null );
+	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 1, 1 ), null );
 	const x = -0.66 + ( 0.66 * index );
-	console.log(x);
 	this.quad.position.x = x;
 	this.scene.add( this.quad );
 

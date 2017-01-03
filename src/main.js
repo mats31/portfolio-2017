@@ -21,6 +21,7 @@ class Main {
 
     this.router = new Router();
     this.start();
+    this.setEvents();
   }
 
   start() {
@@ -28,6 +29,8 @@ class Main {
       router: this.router,
     }).$mount('#application');
   }
+
+  setEvents() {}
 }
 
 domready(() => {

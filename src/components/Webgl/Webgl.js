@@ -33,8 +33,6 @@ export default Vue.extend({
 
   created() {
 
-    // console.log(THREE);
-
     this.setup();
 
     // Signals.onAssetLoaded.add(this.onAssetLoaded);
@@ -46,6 +44,8 @@ export default Vue.extend({
     this.webglRenderer.domElement.style.position = 'absolute';
     this.$refs.container.appendChild(this.webglRenderer.domElement);
     this.$refs.container.appendChild(this.cssRenderer.domElement);
+
+    this.setEvents();
   },
 
   methods: {
@@ -54,9 +54,16 @@ export default Vue.extend({
 
       this.composer = null;
       this.projectObjects = [];
+      this.mouse = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
 
       this.createRenderers(window.innerWidth, window.innerHeight);
       this.createWebgl();
+    },
+
+    setEvents() {
+
+      this.$refs.container.addEventListener('mousemove', this.onMousemove.bind(this), false);
     },
 
     createRenderers(width, height) {
@@ -207,6 +214,30 @@ export default Vue.extend({
       // this.createCSSObjects();
       // this.render();
       this.animate();
+    },
+
+    onMousemove(event) {
+
+      this.mouse.x = ( ( event.clientX / window.innerWidth ) * 2 ) - 1;
+      this.mouse.y = ( -( event.clientY / window.innerHeight ) * 2 ) + 1;
+
+      this.checkProjectPicking();
+    },
+
+    checkProjectPicking() {
+
+      this.raycaster.setFromCamera( this.mouse, this.webglCamera );
+
+      for ( let i = 0; i < this.projectObjects.length; i += 1) {
+
+        const intersects = this.raycaster.intersectObjects( this.projectObjects[i].children );
+
+        if (intersects.length > 0) {
+          this.projectObjects[i].onZoomIn();
+        } else {
+          this.projectObjects[i].onZoomOut();
+        }
+      }
     },
 
     /* Update */
