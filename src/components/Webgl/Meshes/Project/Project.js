@@ -1,89 +1,112 @@
+import States from 'core/States';
+
 import vertexShader from './shaders/project.vs';
 import fragmentShader from './shaders/project.fs';
 
 class Project extends THREE.Object3D {
 
-  constructor() {
+  constructor(texture, texture2) {
 
     super();
 
-    this.nbGeometry = 10;
-    this.geometries = [
-      // new THREE.PlaneGeometry(8, 8, 1, 1),
-      new THREE.BoxGeometry(8, 8, 8, 1, 1, 1),
-      new THREE.BoxGeometry(8, 8, 10, 1, 1, 1),
-      new THREE.SphereGeometry(5, 10, 10),
-    ];
-    this.meshes = [];
-    this.createMeshes();
+    this.texture = texture;
+    this.texture.needsUpdate = true;
+    this.texture.minFilter = THREE.LinearFilter;
+
+    this.texture2 = texture;
+    this.texture2.needsUpdate = true;
+    this.texture2.minFilter = THREE.LinearFilter;
+
+    this.createMesh();
   }
 
-  createMeshes() {
+  createMesh() {
 
-    for ( let i = 0; i < this.nbGeometry; i += 1 ) {
+    this.width = window.innerWidth * 0.75;
 
-      const geometry = this.geometries[i % this.geometries.length];
+    this.geometry = new THREE.PlaneGeometry( this.width, this.width * 0.5, 1);
 
-      const material = new THREE.ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        uniforms: {
-          time: { type: 'f', value: 0 },
-          u_speed: { type: 'f', value: ( Math.random() * 10 ) + 10 },
-        },
-        wireframe: false,
-        side: THREE.DoubleSide,
-      });
+    const offsetMap = States.resources.getTexture('offset').media;
+    offsetMap.needsUpdate = true;
+    offsetMap.wrapS = THREE.RepeatWrapping;
+    offsetMap.wrapT = THREE.RepeatWrapping;
 
-      const mesh = new THREE.Mesh( geometry, material );
+    this.material = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        alphaValue: { type: 'f', value: 1 },
+        map: { type: 't', value: this.texture },
+        offsetMap: { type: 't', value: offsetMap },
+        offsetValue: { type: 'f', value: 0 },
+        time: { type: 'f', value: 0 },
+        u_center: { type: 'v2', value: new THREE.Vector2(0) },
+      },
+      transparent: true,
+      wireframe: false,
+      // side: THREE.DoubleSide,
+    });
 
-      mesh.position.x = ( Math.random() * 2 ) - 1;
-      mesh.position.y = ( Math.random() * 2 ) - 1;
+    this.mesh = new THREE.Mesh( this.geometry, this.material );
 
-      mesh.rotation.y = Math.random() * Math.PI * 2;
+    this.add(this.mesh);
+  }
 
-      this.meshes.push(mesh);
-      this.add(mesh);
-    }
+  setCenter(center) {
+
+    this.material.uniforms.u_center.value = center;
+  }
+
+  click() {
+
+    // const alphaDuration = 2;
+
+    TweenLite.to(
+      this.material.uniforms.offsetValue,
+      2,
+      {
+        value: 0.5,
+        ease: 'Power2.easeOut',
+      },
+    );
+
+    TweenLite.to(
+      this.material.uniforms.alphaValue,
+      2,
+      {
+        value: 0,
+        ease: 'Power2.easeOut',
+      },
+    );
   }
 
   onZoomIn() {
 
-    for (let i = 0; i < this.meshes.length; i += 1) {
-      TweenLite.to(
-        this.meshes[i].scale,
-        0.5,
-        {
-          x: 2,
-          y: 2,
-          z: 2,
-          ease: 'Power2.easeOut',
-        },
-      );
-    }
+    TweenLite.to(
+      this.material.uniforms.offsetValue,
+      1,
+      {
+        value: 0.01,
+        ease: 'Power2.easeOut',
+      },
+    );
   }
 
   onZoomOut() {
 
-    for (let i = 0; i < this.meshes.length; i += 1) {
-      TweenLite.to(
-        this.meshes[i].scale,
-        0.5,
-        {
-          x: 1,
-          y: 1,
-          z: 1,
-          ease: 'Power2.easeOut',
-        },
-      );
-    }
+    TweenLite.to(
+      this.material.uniforms.offsetValue,
+      1,
+      {
+        value: 0,
+        ease: 'Power2.easeOut',
+      },
+    );
   }
 
   update(time) {
 
-    for ( let i = 0; i < this.meshes.length; i += 1) {
-      this.meshes[i].material.uniforms.time.value = time * 0.3;
-    }
+    this.material.uniforms.time.value = time;
   }
 }
 
