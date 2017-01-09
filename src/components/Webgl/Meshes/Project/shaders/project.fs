@@ -39,7 +39,7 @@ void main() {
   vec3 color = texture.rgb;
   // vec3 color = texture.rgb + vec3( step( vUv, vec2(0.5) ), step( vUv, vec2(0.5) ), step( vUv, vec2(0.5) ) );
   // vec3 color = texture.rgb + step( vUv.x, 0.5 );
-  float alpha = texture.a * alphaValue;
+  float alpha = texture.a * min( 1., abs(offsetTexture.r - 1.) + 1. - alphaValue );
   // float alpha = 1. /* - distance( u_center, gl_FragCoord.xy ) */;
 
   gl_FragColor = vec4( color, alpha );

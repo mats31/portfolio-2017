@@ -35,7 +35,7 @@ class Project extends THREE.Object3D {
       vertexShader,
       fragmentShader,
       uniforms: {
-        alphaValue: { type: 'f', value: 1 },
+        alphaValue: { type: 'f', value: 0 },
         map: { type: 't', value: this.texture },
         offsetMap: { type: 't', value: offsetMap },
         offsetValue: { type: 'f', value: 0 },
@@ -74,7 +74,7 @@ class Project extends THREE.Object3D {
       this.material.uniforms.alphaValue,
       2,
       {
-        value: 0,
+        value: 2,
         ease: 'Power2.easeOut',
       },
     );
