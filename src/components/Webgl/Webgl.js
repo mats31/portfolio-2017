@@ -93,7 +93,7 @@ export default Vue.extend({
 
       // this.webglCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       // this.webglCamera.position.z = 1;
-      this.webglCamera = new THREE.OrthographicCamera( width * -0.5, width * 0.5, height * 0.5, height * -0.5, 1, 1000 );
+      this.webglCamera = new THREE.OrthographicCamera( width * -0.5, width * 0.5, height * 0.5, height * -0.5, 1, 10000 );
 
       this.cssCamera = new THREE.PerspectiveCamera(50, width / height, 1, 10000);
       this.cssCamera.position.z = 1;
@@ -101,12 +101,14 @@ export default Vue.extend({
       this.webglRenderer = new THREE.WebGLRenderer();
       this.webglRenderer.setSize(width, height);
       this.webglRenderer.setClearColor(0xffffff);
+      this.webglRenderer.antialias = true;
 
       this.cssRenderer = new THREE.CSS3DRenderer();
       this.cssRenderer.setSize(width, height);
     },
 
-    createWebgl() {},
+    createWebgl() {
+    },
 
     createMask() {
 
@@ -147,6 +149,16 @@ export default Vue.extend({
           this.context.fillRect(x, y, 1, 1);
         }
       }
+    },
+
+    addBackground() {
+
+      this.background = new Background();
+      this.background.position.y = window.innerHeight * 0.6;
+      this.background.position.z = -2;
+      this.background.rotation.x = 0.5;
+
+      this.scene.add(this.background);
     },
 
     addProjects() {
@@ -271,6 +283,7 @@ export default Vue.extend({
       this.clock = new Clock();
 
       this.createComposer();
+      this.addBackground();
       this.addProjects();
       // this.createCSSObjects();
       // this.render();
@@ -279,15 +292,9 @@ export default Vue.extend({
 
     onClick() {
 
-      console.log(this);
-      console.log('test2');
-      console.log(this.hoverProject);
+      this.background.click();
 
       if (this.hoverProject) {
-
-        // this.drawMaskActive = true;
-
-        console.log('test');
 
         this.hoverProject.click();
       }
@@ -353,6 +360,9 @@ export default Vue.extend({
       for ( let i = 0; i < this.projectObjects.length; i += 1) {
         this.projectObjects[i].update( this.clock.time );
       }
+
+      this.background.update( this.clock.time );
+      // this.background.rotation.x += 0.01;
 
       this.webglRenderer.render(this.scene, this.webglCamera);
 

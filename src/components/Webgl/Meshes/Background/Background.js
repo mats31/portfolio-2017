@@ -8,15 +8,27 @@ class Background extends THREE.Object3D {
 
     super();
 
-    this.geometry = new THREE.PlaneGeometry(200, 200, 20, 20);
+    const offsetMap = States.resources.getTexture('offset').media;
+    offsetMap.needsUpdate = true;
+    offsetMap.wrapS = THREE.RepeatWrapping;
+    offsetMap.wrapT = THREE.RepeatWrapping;
+
+    this.geometry = new THREE.PlaneGeometry(
+      window.innerWidth,
+      window.innerHeight * 2.6,
+      30,
+      30);
 
     this.material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
-        time: { value: 0.0 },
-        color: { value: new THREE.Color(0xffffff) },
+        time: { type: 'f', value: 0.0 },
+        color: { type: 'v3', value: new THREE.Color(0xffffff) },
         map: { type: 't', value: new THREE.Texture() },
+        offsetMap: { type: 't', value: offsetMap },
+        offsetValue: { type: 'f', value: 0 },
+        u_resolution: { type: 'v2', value: new THREE.Vector2( window.innerWidth, window.innerHeight ) },
       },
       wireframe: false,
       side: THREE.DoubleSide,
@@ -25,9 +37,21 @@ class Background extends THREE.Object3D {
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.add(this.mesh);
 
-    Signals.onAssetsLoaded.add(this.onAssetsLoaded.bind(this));
+    // Signals.onAssetsLoaded.add(this.onAssetsLoaded.bind(this));
 
     // this.addGUI()
+  }
+
+  click() {
+
+    TweenLite.to(
+      this.material.uniforms.offsetValue,
+      2,
+      {
+        value: 0.5,
+        ease: 'Power2.easeOut',
+      },
+    );
   }
 
   onAssetsLoaded() {

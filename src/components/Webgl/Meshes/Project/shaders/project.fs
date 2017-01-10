@@ -20,16 +20,16 @@ void main() {
   timeOffset.y -= time * 0.1;
 
   vec4 offsetTexture = texture2D(offsetMap, timeOffset);
-  float xOffset = offsetTexture.r * offsetValue * 0.6;
-  float yOffset = offsetTexture.r * offsetValue;
+  float xOffset = offsetTexture.r * offsetValue * 4.;
+  float yOffset = offsetTexture.r * offsetValue * 3.;
 
   // vec4 dst_map_val2 = texture2D(offsetMap, vUv);
   // vec2 dst_offset2 = dst_map_val2.xy;
   // dst_offset2 *= ((0.0008) * (1.0 - gradC.a));
 
   vec2 uv = vUv;
-  uv.x += xOffset - 0.35 * offsetValue;
-  uv.y += yOffset - 0.6 * offsetValue;
+  uv.x += xOffset - 2.3 * offsetValue;
+  uv.y += yOffset - 1.6 * offsetValue;
   // uv.y -= time * 0.01;
 
   vec4 texture = texture2D(map, uv);
